@@ -1,11 +1,13 @@
 package gr.aueb.cf.ch15.abstract_classes.school;
 
-public class AbstractActor {
+public abstract class AbstractActor {
     private long id;
     private String firstname;
     private String lastname;
 
-    public AbstractActor() {}
+    public AbstractActor() {
+
+    }
 
     public AbstractActor(long id, String firstname, String lastname) {
         this.id = id;
