@@ -1,7 +1,5 @@
 package gr.aueb.cf.ch15.special_intefaces;
 
-import java.util.SplittableRandom;
-
 public class Book implements  IProduct{
     private int id;
     private String title;

@@ -16,7 +16,7 @@ public class Main {
         } else if (product instanceof CompactDisc) {
             System.out.println("Delevering CD...");
         } else {
-            throw new IllegalArgumentException("Invalid product type.")
+            throw new IllegalArgumentException("Invalid product type.");
         }
     }
 }
