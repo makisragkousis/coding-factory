@@ -1,9 +1,5 @@
 package gr.aueb.cf.ch16.callbacks;
 
-import gr.aueb.cf.ch15.special_intefaces.IProduct;
-
-import java.awt.print.Printable;
-
 public class Main {
 
     public static void main(String[] args) {
