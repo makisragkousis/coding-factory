@@ -1,6 +1,6 @@
 package gr.aueb.cf.ch17.singly_linked_list;
 
-public class SingleList<T> {
+public class SinglyList<T> {
     private Node<T> head = null;
 
     public void insertFirst(T t) {

@@ -15,7 +15,7 @@ public class Main {
         bag.add("orange");
 
         if (bag.contains("apple")) {
-            bag.remove("aplle");
+            bag.remove("apple");
         } else {
             System.out.println("Not found");
         }
