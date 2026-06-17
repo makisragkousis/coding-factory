@@ -1,5 +1,6 @@
 package gr.aueb.cf.ch18.bankapp.service;
 
+import gr.aueb.cf.ch18.bankapp.core.exceptions.AccountAlreadyExistsException;
 import gr.aueb.cf.ch18.bankapp.core.exceptions.AccountNotFoundException;
 import gr.aueb.cf.ch18.bankapp.core.exceptions.InsufficientBalanceException;
 import gr.aueb.cf.ch18.bankapp.core.exceptions.NegativeAmountException;
@@ -24,13 +25,31 @@ public class AccountServiceImpl implements IAccountService {
 
 
     @Override
-    public AccountReadOnlyDTO createNewAccount(AccountInsertDTO accountInsertDTO) {
-        // TODO: Validation
-        Account accountToReturn;
+    public AccountReadOnlyDTO createNewAccount(AccountInsertDTO accountInsertDTO)
+            throws NegativeAmountException {
+        try {
+            if (accountInsertDTO.balance().compareTo(BigDecimal.ZERO) < 0) {
+                throw new NegativeAmountException("The initial balance " + accountInsertDTO.balance() +
+                        " must not ne negative");
+            }
 
-        Account account = Mapper.mapToModelEntity(accountInsertDTO);
-        accountToReturn = accountDAO.saveOrUpdate(account);
-        return Mapper.mapToReadOnlyDTO(accountToReturn);
+            // if used only for creating new accounts
+//            if (accountDAO.isAccountExists(accountInsertDTO.iban())) {
+//                throw new AccountAlreadyExistsException("");
+//            }
+
+            Account accountToReturn;
+            Account account = Mapper.mapToModelEntity(accountInsertDTO);
+            accountToReturn = accountDAO.saveOrUpdate(account);
+            return Mapper.mapToReadOnlyDTO(accountToReturn);
+        } catch (NegativeAmountException e) {
+            System.err.printf("%s. The initial balance %f is negative. \n",
+                    LocalDateTime.now(),
+                    accountInsertDTO.balance());
+            throw e;
+        }
+
+
     }
 
     @Override
@@ -63,6 +82,7 @@ public class AccountServiceImpl implements IAccountService {
                     .orElseThrow(() ->
                             new AccountNotFoundException("Account with IBAN " + withdrawDTO.iban() + " not found.")
                     );
+
             if (account.getBalance().compareTo(withdrawDTO.amount()) < 0) {
                 throw new InsufficientBalanceException("Amount " + withdrawDTO.amount() +
                         " for account with IBAN" + account.getIban() + " is greater than the balance");
@@ -92,8 +112,11 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public BigDecimal getBalance(String iban) throws AccountNotFoundException {
         try {
-            Account account = accountDAO.findByIban(iban)
-                    .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+            Account account = accountDAO
+                    .findByIban(iban)
+                    .orElseThrow(
+                            () -> new AccountNotFoundException("Account not found")
+                    );
             return account.getBalance();
         } catch (AccountNotFoundException e) {
             System.err.printf(
@@ -107,7 +130,9 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public List<AccountReadOnlyDTO> getAllAccounts() {
-        return accountDAO.findAll().stream()
+        return accountDAO
+                .findAll()
+                .stream()
                 .map(Mapper::mapToReadOnlyDTO)
                 .toList();
     }
